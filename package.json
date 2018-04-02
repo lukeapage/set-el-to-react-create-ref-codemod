@@ -1,0 +1,37 @@
+{
+  "name": "set-el-to-react-create-ref-codemod",
+  "version": "1.0.0",
+  "description": "Codemod to tranform a setEl function callback to react createRef",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "build": "rm -rf ./dist && babel src --out-dir dist",
+    "precommit": "npm run test"
+  },
+  "author": "Luke Page",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lukeapage/set-el-to-react-create-ref-codemod.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lukeapage/set-el-to-react-create-ref-codemod/issues"
+  },
+  "keywords": [
+    "jscodeshift",
+    "react",
+    "setEl",
+    "createRef"
+  ],
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "jest": "^22.4.3",
+    "jscodeshift": "^0.5.0"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "lodash": "^4.17.5"
+  }
+}
