@@ -9,8 +9,12 @@ class Tooltip extends React.Component {
       this.el = el;
     };
   }
+
+  handleClick() {
+    this.el.focus();
+  }
   
   render() {
-    return <div ref={this.setEl} />
+    return <div ref={this.setEl} />;
   }
 }

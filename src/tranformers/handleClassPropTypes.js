@@ -9,9 +9,16 @@ const getConstructorContents = (j, path, cb) =>
   });
 
 const checkArrowWithSingleAssignment = (arrowNode) =>
-  arrowNode.type !== 'X' ? {
+  arrowNode.body.body.length === 1 &&
+  arrowNode.body.body[0].type === 'ExpressionStatement' &&
+  arrowNode.body.body[0].expression.type === 'AssignmentExpression' &&
+  arrowNode.body.body[0].expression.left.type === 'MemberExpression' &&
+  arrowNode.body.body[0].expression.left.object.type === 'ThisExpression' &&
+  arrowNode.body.body[0].expression.left.property.type === 'Identifier' &&
+  arrowNode.body.body[0].expression.right.type === 'Identifier'
+   ? {
     isValid: true,
-    elementName: arrowNode.name,
+    elementName: arrowNode.body.body[0].expression.left.property.name,
   } : {
     isValid: false
   };
@@ -30,9 +37,7 @@ export default (j, ast, options) => {
 
   classComponents.forEach((path) => {
     const { node } = path;
-    debugger;
     const constructorNodes = getConstructorContents(j, path, (constructorStatementPaths) => {
-      console.log('got paths', constructorStatementPaths.length);
       constructorStatementPaths
         .filter((p) =>
           p.node.expression.type === 'AssignmentExpression' &&
@@ -44,6 +49,7 @@ export default (j, ast, options) => {
         .forEach((setElPath) => {
           const refFnName = setElPath.node.expression.left.property.name;
           const arrowNode = setElPath.node.expression.right;
+          debugger;
           const {
             isValid,
             elementName,
@@ -52,17 +58,39 @@ export default (j, ast, options) => {
           if (!isValid) {
             throw new Error('unexpected setEl');
           }
+
+          const newElementName = elementName + 'Ref';
     
           j(setElPath).replaceWith(j.expressionStatement(j.assignmentExpression(
             '=',            
             j.memberExpression(
               j.thisExpression(),
-              j.identifier('test'),
+              j.identifier(newElementName),
             ),
             j.callExpression(j.memberExpression(
               j.identifier('React'),
               j.identifier('createRef')
-            ), []))));    
+            ), []))));
+
+          j(path)
+            .find(j.Identifier, { name: 'setEl' })
+            .filter((setElIdentifier) =>
+              setElIdentifier.parent.node.type === 'MemberExpression' &&
+              setElIdentifier.parent.node.object.type === 'ThisExpression'
+            )
+            .forEach((setElIdentifier) => {
+              j(setElIdentifier).replaceWith(j.identifier(newElementName))
+            });
+
+            j(path)
+              .find(j.Identifier, { name: elementName })
+              .filter((elIdentifier) =>
+                elIdentifier.parent.node.type === 'MemberExpression' &&
+                elIdentifier.parent.node.object.type === 'ThisExpression'
+            )
+            .forEach((elIdentifier) => {
+              j(elIdentifier).replaceWith(j.memberExpression(j.identifier(newElementName),j.identifier('current')))
+            });            
         })
     });
   });

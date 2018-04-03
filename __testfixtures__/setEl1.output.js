@@ -5,10 +5,14 @@ class Tooltip extends React.Component {
   constructor(props) {
     super(props);
 
-    this.el = React.createRef();
+    this.elRef = React.createRef();
+  }
+
+  handleClick() {
+    this.elRef.current.focus();
   }
   
   render() {
-    return <div ref={this.setEl} />
+    return <div ref={this.elRef} />;
   }
 }
