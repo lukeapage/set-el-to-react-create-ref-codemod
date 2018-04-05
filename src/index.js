@@ -1,7 +1,6 @@
 import 'babel-polyfill';
 
-import { flow, map, reduce, findIndex, findLastIndex, find } from 'lodash/fp';
-import handleClassPropTypes from './tranformers/handleClassPropTypes';
+import handleClassPropTypes from './tranformers/convertSetEl';
 
 export const parser = 'flow';
 

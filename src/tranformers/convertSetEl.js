@@ -1,4 +1,3 @@
-import { get } from 'lodash';
 import isReactClass from '../util/isReactClass';
 
 const getConstructorContents = (j, path, cb) =>
@@ -44,12 +43,11 @@ export default (j, ast, options) => {
           p.node.expression.left.type === 'MemberExpression' &&
           p.node.expression.left.object.type === 'ThisExpression' &&
           p.node.expression.left.property.type === 'Identifier' &&
-          p.node.expression.left.property.name === 'setEl' &&
+          p.node.expression.left.property.name.match(/set[a-zA-Z]*El/) &&
           p.node.expression.right.type === 'ArrowFunctionExpression')
         .forEach((setElPath) => {
           const refFnName = setElPath.node.expression.left.property.name;
           const arrowNode = setElPath.node.expression.right;
-          debugger;
           const {
             isValid,
             elementName,
@@ -73,7 +71,7 @@ export default (j, ast, options) => {
             ), []))));
 
           j(path)
-            .find(j.Identifier, { name: 'setEl' })
+            .find(j.Identifier, { name: refFnName })
             .filter((setElIdentifier) =>
               setElIdentifier.parent.node.type === 'MemberExpression' &&
               setElIdentifier.parent.node.object.type === 'ThisExpression'
